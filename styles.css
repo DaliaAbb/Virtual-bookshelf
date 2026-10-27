@@ -1,0 +1,1135 @@
+/* ==========================================================================
+   Colors come from variables: the defaults below are the day palette; the day / night blocks
+   further down (chosen by script.js from the clock) override them and set the painted picture.
+   ========================================================================== */
+:root {
+    /* text on the picture */
+    --on-bg: #f3e6cc;
+
+    /* type */
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --sans: system-ui, sans-serif;
+    --title-font: var(--serif);
+    --title-color: #f6dc9a;
+    --title-glow: 0 0 8px rgba(255, 190, 90, 0.6), 0 1px 2px rgba(0, 0, 0, 0.7);
+    --title-transform: none;
+    --title-spacing: 0.6px;
+    --title-style: italic;
+    --title-size: 15px;
+
+    /* shape and finish */
+    --radius: 12px;
+    --btn-radius: 999px;
+    --border-w: 0px;
+    --border-c: transparent;
+    --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    --btn-shadow: 0 2px 3px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    --icon-shadow: 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 -2px 3px rgba(90, 60, 20, 0.25), inset 0 1px 1px #fff;
+
+    --on-back: #f3e6cc;
+
+    /* paper cards, fields, buttons */
+    --paper-1: #fcf3df;
+    --paper-2: #efdfbd;
+    --ink: #3b2314;
+    --muted: #7d6a50;
+    --field-bg: #fffaf0;
+    --field-line: #b9a584;
+    --stat-1: #f0e0bd;
+    --stat-2: #e6d3a9;
+    --track: #d9c7a3;
+    --save-bg: #ead9b4;
+    --btn-1: #8f5d38;
+    --btn-2: #6b4426;
+    --btn-text: #f3e6cc;
+    --bright-1: #fbf0d8;
+    --bright-2: #e6d2a8;
+    --bright-text: #3b2314;
+    --danger: #b3402a;
+
+    /* round toolbar buttons */
+    --icon-1: #fff8e6;
+    --icon-2: #e2cd9f;
+    --icon-3: #c9b07a;
+    --icon-active-1: #ffffff;
+    --icon-active-2: #fbe7b0;
+    --glow: #e0a85a;
+
+    /* accents */
+    --accent: #d9b44a;
+    --accent-2: #e8c25a;
+
+    /* spines */
+    --band: rgba(255, 255, 255, 0.45);
+    --band-archived: #e8cf7a;
+    --band-h: 2px;
+    --spine-shine: rgba(255, 255, 255, 0.3);
+    --spine-shade: rgba(0, 0, 0, 0.4);
+    --spine-edge: rgba(0, 0, 0, 0.5);
+    --spine-edge-w: 1px;
+
+    /* lights (script.js reads the three colour lists) */
+    --wire: #1f3a22;
+    --scrim: rgba(20, 8, 2, 0.6);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    color: var(--on-bg);
+    font-family: var(--sans);
+    font-size: 13px;
+    user-select: none;
+    overflow: hidden;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Frameless window: only the header drags it. It floats over the top of the picture. */
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    z-index: 5;
+    -webkit-app-region: drag;
+}
+
+/* the title is the nameplate in the middle of the arch */
+.title {
+    position: absolute;
+    top: 8px;
+    z-index: 2;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--title-font);
+    font-size: var(--title-size);
+    font-style: var(--title-style);
+    text-transform: var(--title-transform);
+    letter-spacing: var(--title-spacing);
+    color: var(--title-color);
+    text-shadow: var(--title-glow);
+}
+
+#close-btn {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+}
+
+button, input, textarea, select {
+    -webkit-app-region: no-drag;
+    font: inherit;
+}
+
+button {
+    background: linear-gradient(var(--bright-1), var(--bright-2));
+    color: var(--bright-text);
+    border: var(--border-w) solid var(--border-c);
+    border-radius: var(--btn-radius);
+    padding: 8px 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: transform 0.12s, filter 0.12s, box-shadow 0.12s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+}
+
+.icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--icon-1), var(--icon-2) 70%, var(--icon-3));
+    box-shadow: var(--icon-shadow);
+}
+
+/* the icon fills the whole round button (the button itself is not clipped, so the badge can overhang) */
+.icon-btn img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.icon-btn.active {
+    background: radial-gradient(circle at 32% 28%, var(--icon-active-1), var(--icon-active-2) 75%);
+    box-shadow: 0 0 0 2px var(--glow), 0 0 12px var(--glow), inset 0 1px 1px #fff;
+}
+
+/* little counter on the "currently reading" button */
+.icon-btn[data-count]::after {
+    content: attr(data-count);
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    border-radius: 8px;
+    background: radial-gradient(circle at 35% 30%, #e0584a, #a52f22);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+}
+
+/* ---------- Shelf and panels ---------- */
+/* Frame: the transparent border shows the border-box layers (side panels); the padding-box layers
+   are the back panel (a color, a pattern and a shadow at the top). */
+/* The shelf and the panel fill the space between the title and the toolbar (the book rows are placed over the painted picture below). */
+.shelf,
+.panel {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.shelf::-webkit-scrollbar,
+.panel::-webkit-scrollbar {
+    display: none;
+}
+
+.panel {
+    padding: 8px 6px;
+}
+
+.panel > * + * {
+    margin-top: 8px;
+}
+
+.shelf-slot {
+    position: relative;
+}
+
+.shelf-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.shelf-row::-webkit-scrollbar {
+    display: none;
+}
+
+/* A spine: lit from the left, shaded on the right, with two decorative bands. */
+.book {
+    --b: var(--band);
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    border-radius: 2px 2px 1px 1px;
+    border: var(--spine-edge-w) solid var(--spine-edge);
+    background-image:
+        linear-gradient(var(--b), var(--b)),
+        linear-gradient(var(--b), var(--b)),
+        linear-gradient(90deg, var(--spine-shine), rgba(255, 255, 255, 0) 22%, rgba(0, 0, 0, 0) 62%, var(--spine-shade));
+    background-position: 0 6px, 0 calc(100% - 6px), 0 0;
+    background-size: 100% var(--band-h), 100% var(--band-h), 100% 100%;
+    background-repeat: no-repeat;
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.18s cubic-bezier(0.3, 1.5, 0.5, 1), box-shadow 0.18s;
+}
+
+.book:hover,
+.book.highlight {
+    transform: translateY(-7px);
+    box-shadow: 1px 8px 8px rgba(0, 0, 0, 0.5);
+}
+
+.book.highlight {
+    outline: 2px solid #ffe7a8;
+    box-shadow: 0 0 12px rgba(255, 220, 140, 0.9), 1px 8px 8px rgba(0, 0, 0, 0.5);
+}
+
+.book span {
+    writing-mode: vertical-rl;
+    max-height: 42px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--serif);
+    font-size: 9.5px;
+    letter-spacing: 0.4px;
+}
+
+/* reading progress on a spine: a stripe growing from the bottom */
+.book .spine-progress {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    box-shadow: 0 0 4px var(--accent);
+}
+
+/* finished books get their own band color */
+.book.archived {
+    --b: var(--band-archived);
+    filter: saturate(0.9);
+}
+
+.empty {
+    padding: 20px 12px;
+    text-align: center;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--on-back);
+    opacity: 0.85;
+}
+
+.toast {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 58px;
+    z-index: 20;
+    margin: 0;
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    border: var(--border-w) solid var(--border-c);
+    text-align: center;
+    background: linear-gradient(var(--paper-1), var(--paper-2));
+    color: var(--ink);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+    animation: pop 0.22s ease-out;
+}
+
+.toast[hidden] {
+    display: none;
+}
+
+.toast .toast-action {
+    margin-left: 10px;
+    padding: 3px 12px;
+    font-size: 12px;
+    background: linear-gradient(var(--btn-1), var(--btn-2));
+    color: var(--btn-text);
+    box-shadow: var(--btn-shadow);
+}
+
+/* the toolbar icons float over the bottom of the picture, spread evenly */
+.toolbar {
+    position: relative;
+    z-index: 6;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: auto;
+    padding: 9px 0 8px;
+}
+
+/* ---------- Paper cards ---------- */
+.card,
+.r-card,
+.s-card {
+    background: linear-gradient(var(--paper-1), var(--paper-2));
+    color: var(--ink);
+    border: var(--border-w) solid var(--border-c);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+}
+
+.card h2,
+.r-card h3 {
+    font-family: var(--serif);
+}
+
+/* buttons inside paper cards use the button color of the current mode */
+.card button,
+.r-card button,
+.s-card button {
+    background: linear-gradient(var(--btn-1), var(--btn-2));
+    color: var(--btn-text);
+    box-shadow: var(--btn-shadow);
+}
+
+/* ---------- Currently reading ---------- */
+.r-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 10px 10px 18px;
+    overflow: hidden;
+}
+
+/* a strip in the book's color down the left, like a spine */
+.r-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 8px;
+    background: linear-gradient(90deg, var(--spine-shine), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.25)), var(--book);
+}
+
+/* ribbon bookmark in the corner */
+.r-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 14px;
+    width: 12px;
+    height: 24px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.2)), var(--book);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+}
+
+.r-card h3 {
+    margin: 0;
+    padding-right: 30px;
+    font-size: 15px;
+}
+
+.r-card p {
+    margin: 0;
+}
+
+.r-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.bar {
+    height: 9px;
+    border-radius: 5px;
+    background: var(--track);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.bar i {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--btn-2), var(--accent-2));
+    box-shadow: 0 0 6px var(--accent-2);
+    transition: width 0.4s;
+}
+
+.r-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.clock {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 23px;
+    font-variant-numeric: tabular-nums;
+}
+
+.clock.running {
+    color: var(--danger);
+    animation: breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    50% { opacity: 0.65; }
+}
+
+.r-save {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--save-bg);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.r-save label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.r-save input {
+    width: 80px;
+}
+
+.panel .btn-sm,
+.card .btn-sm {
+    padding: 5px 12px;
+    font-size: 12px;
+}
+
+.r-card button.ghost {
+    background: transparent;
+    color: var(--btn-2);
+    box-shadow: inset 0 0 0 1px var(--btn-2);
+}
+
+/* ---------- Goal and stats ---------- */
+.s-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+}
+
+.year-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.year-nav button {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+}
+
+.ring-wrap {
+    position: relative;
+}
+
+.ring-wrap svg text {
+    font-family: var(--serif);
+}
+
+.ring-wrap.done {
+    animation: glow 1.8s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 2px var(--accent)); }
+    50% { filter: drop-shadow(0 0 10px var(--accent)); }
+}
+
+.goal-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.goal-form input {
+    width: 64px;
+    padding: 5px 8px;
+    border: 1px solid var(--field-line);
+    border-radius: 6px;
+    background: var(--field-bg);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+}
+
+.stat {
+    padding: 6px;
+    border-radius: 8px;
+    background: linear-gradient(var(--stat-1), var(--stat-2));
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.stat b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 17px;
+}
+
+.stat small {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* ---------- Fairy lights ---------- */
+
+.row-lights {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.row-lights .wire {
+    fill: none;
+    stroke: var(--wire);
+    stroke-width: 1.2;
+}
+
+.row-lights .bulb {
+    fill: var(--c, #ffd27a);
+    filter: drop-shadow(0 0 3px var(--c, #ffb347)) drop-shadow(0 0 7px var(--c, rgba(255, 190, 90, 0.85)));
+    animation: twinkle 2.8s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+/* ---------- Particles (finished book flying to the archive) ---------- */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    pointer-events: none;
+}
+
+/* the archive button pops when a book arrives, and a "+1" floats up from it */
+.icon-btn.bump {
+    animation: bump 0.6s ease-out;
+}
+
+@keyframes bump {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.35); box-shadow: 0 0 0 3px var(--glow), 0 0 18px var(--glow); }
+    100% { transform: scale(1); }
+}
+
+.plus-one {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    z-index: 2;
+    font: 700 14px var(--sans);
+    color: var(--accent-2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    animation: float-up 1.3s ease-out forwards;
+}
+
+@keyframes float-up {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -26px); }
+}
+
+/* ---------- Modals ---------- */
+.modal {
+    z-index: 10;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--scrim);
+    backdrop-filter: blur(2px);
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 260px;
+    max-height: 90%;
+    overflow-y: auto;
+    padding: 12px;
+    animation: pop 0.22s ease-out;
+}
+
+.card h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.card p {
+    margin: 0;
+}
+
+.card input,
+.card textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--field-line);
+    border-radius: 6px;
+    background: var(--field-bg);
+    color: var(--ink);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.card input:focus,
+.card textarea:focus,
+.goal-form input:focus {
+    outline: 2px solid var(--glow);
+    outline-offset: 0;
+}
+
+/* delete: outlined first, solid red on the confirmation */
+.card button.danger-ghost,
+.r-card button.danger-ghost {
+    background: transparent;
+    color: var(--danger);
+    box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.card button.danger,
+.r-card button.danger {
+    background: linear-gradient(#c5503c, #a03222);
+    color: #fff;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: space-between;
+}
+
+.row > p {
+    flex-basis: 100%;
+}
+
+.row input:last-child:not(:only-child) {
+    max-width: 50px;
+}
+
+.color-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.color-row input {
+    width: 40px;
+    height: 26px;
+    padding: 0;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+/* ---------- Motion ---------- */
+@keyframes pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); }
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+}
+
+.panel > * {
+    animation: rise 0.35s ease-out both;
+}
+
+.panel > :nth-child(2) { animation-delay: 0.07s; }
+.panel > :nth-child(3) { animation-delay: 0.14s; }
+.panel > :nth-child(4) { animation-delay: 0.21s; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+.r-save input.wide { width: 130px; }
+
+/* search: the box takes the place of the title on the nameplate */
+#search-btn, #mode-btn { position: absolute; top: 4px; width: 26px; height: 26px; font-size: 12px; }
+.search-input {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 160px;
+    transform: translateX(-50%);
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: rgba(255, 247, 230, 0.95);
+    color: #2a1a10;
+    font-size: 12px;
+    user-select: text;
+}
+.book { transition: transform 0.18s cubic-bezier(0.3, 1.5, 0.5, 1), box-shadow 0.18s, opacity 0.2s, filter 0.2s; }
+.book.dim { opacity: 0.22; filter: grayscale(0.7); }
+.book.found { outline: 2px solid #ffe7a8; box-shadow: 0 0 12px rgba(255, 220, 140, 0.9), 1px 8px 8px rgba(0, 0, 0, 0.5); }
+
+/* hovered book: a larger card with the whole name floats over the spine */
+.spine-card {
+    position: fixed;
+    z-index: 45;
+    /* vertical like the spine; long names wrap into a second column instead of getting cut off */
+    writing-mode: vertical-rl;
+    max-height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    box-sizing: border-box;
+    border: var(--spine-edge-w) solid var(--spine-edge);
+    border-radius: 3px;
+    background-image:
+        linear-gradient(var(--band), var(--band)),
+        linear-gradient(var(--band), var(--band)),
+        linear-gradient(90deg, var(--spine-shine), rgba(255, 255, 255, 0) 25%, rgba(0, 0, 0, 0) 70%, var(--spine-shade));
+    background-position: 0 4px, 0 calc(100% - 4px), 0 0;
+    background-size: 100% 2px, 100% 2px, 100% 100%;
+    background-repeat: no-repeat;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+    font-family: var(--serif);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+    animation: pop 0.14s ease-out;
+}
+.spine-card[hidden] { display: none; }
+
+/* ==========================================================================
+   Day / night: two painted bookcases (assets/shelf/<mode>/), picked by the clock in script.js.
+   The pillars already carry painted vines and flowers, so no extra flower lights are drawn.
+   ========================================================================== */
+:root[data-mode="day"] {
+
+    --title-color: #fff0c4;
+    --title-glow: 0 1px 2px #000, 0 0 8px rgba(120, 60, 0, 0.9);
+    --paper-1: #fff6e3;
+    --paper-2: #f3e2bf;
+    --ink: #3d2815;
+    --muted: #86683f;
+    --field-bg: #fffaf0;
+    --field-line: #c9a972;
+    --stat-1: #f6e5bf;
+    --stat-2: #ecd5a2;
+    --track: #e0c88f;
+    --save-bg: #f0dcb0;
+    --btn-1: #c79448;
+    --btn-2: #94622b;
+    --btn-text: #fff6df;
+    --bright-1: #fff8e8;
+    --bright-2: #f0d9a8;
+    --bright-text: #3d2815;
+    --accent: #e3a93a;
+    --accent-2: #f1c45e;
+    --glow: #f2b24f;
+    --danger: #b3402a;
+}
+
+:root[data-mode="night"] {
+
+    --title-color: #ece6ff;
+    --title-glow: 0 1px 2px #000, 0 0 9px rgba(150, 130, 255, 0.9);
+    --paper-1: #2e2958;
+    --paper-2: #231f46;
+    --ink: #eeeaff;
+    --muted: #aaa4d8;
+    --field-bg: #1b1737;
+    --field-line: #5d57a0;
+    --stat-1: #383268;
+    --stat-2: #2d2860;
+    --track: #443e7c;
+    --save-bg: #2a2552;
+    --btn-1: #8478dc;
+    --btn-2: #5b50b4;
+    --btn-text: #ffffff;
+    --bright-1: #3b3570;
+    --bright-2: #2e2962;
+    --bright-text: #eeeaff;
+    --accent: #f2d27c;
+    --accent-2: #ffe29a;
+    --glow: #9a8fff;
+    --danger: #ff8a8a;
+    --band-archived: #cfc4ff;
+}
+
+/* cards and fields in the night colors need light text on dark paper */
+:root[data-mode="night"] .card input,
+:root[data-mode="night"] .card textarea,
+:root[data-mode="night"] .r-save input { color: var(--ink); }
+
+/* night: the round buttons stay cream, so their symbols stay dark; outlined buttons use lavender */
+:root[data-mode="night"] .icon-btn { color: #2b2150; }
+:root[data-mode="night"] .r-card button.ghost,
+:root[data-mode="night"] .card button.ghost {
+    color: #d6d0ff;
+    box-shadow: inset 0 0 0 1px #8f86e0;
+}
+:root[data-mode="night"] .r-card button.danger-ghost,
+:root[data-mode="night"] .card button.danger-ghost { color: #ff9d9d; box-shadow: inset 0 0 0 1px #ff9d9d; }
+
+/* ==========================================================================
+   The whole painted picture is the background (nothing cropped); the book rows sit on its painted
+   shelves. Geometry is in fractions of the 1024 x 1536 picture, scaled to the window above the toolbar.
+   ========================================================================== */
+:root[data-mode="day"] {
+    --s-img: url(./assets/icons/day_shelf.png);
+    --s-fill: #6d5a3d;
+    --fl: 0.2617;   /* left / right edge of the shelf interior */
+    --fr: 0.7471;
+    --ftop: 0.2161; /* top of the first row */
+}
+:root[data-mode="night"] {
+    --s-img: url(./assets/icons/night_shelf.png);
+    --s-fill: #0b0922;
+    --fl: 0.2715;
+    --fr: 0.7344;
+    --ftop: 0.2233;
+}
+
+:root {
+    --H: max(100vh, 150vw);                  /* height of the picture: it covers the whole window (the toolbar floats over its bottom) */
+    --W: calc(var(--H) * 2 / 3);             /* its width (the picture is 2:3) */
+    --pitch: calc(var(--H) * 0.1198);        /* distance between two painted boards */
+    --rows: 5;                               /* the picture has five painted shelves */
+}
+
+body {
+    background: var(--s-img) center top / auto var(--H) no-repeat, var(--s-fill);
+}
+/* Reading and Goal: the same picture, dimmed, behind the cards */
+body[data-view="reading"],
+body[data-view="stats"] {
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        var(--s-img) center top / auto var(--H) no-repeat, var(--s-fill);
+}
+
+/* the book rows: a window over the painted interior, one slot per painted shelf */
+.shelf,
+body[data-view="archive"] .panel {
+    position: absolute;
+    left: calc(50% - var(--W) / 2 + var(--W) * var(--fl));
+    top: calc(var(--H) * var(--ftop));
+    width: calc(var(--W) * (var(--fr) - var(--fl)));
+    height: calc(var(--pitch) * var(--rows));
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+}
+body[data-view="archive"] .panel > * + * { margin-top: 0; }
+
+.shelf-slot { height: var(--pitch); scroll-snap-align: start; }
+.shelf-row {
+    height: 100%;
+    padding: 0 3px calc(var(--pitch) * 0.2);
+}
+.shelf-row .book { zoom: var(--book-zoom, 0.88); }  /* books are a bit smaller to fit the painted shelves */
+
+body:not([data-view="shelf"]):not([data-view="archive"]) .panel {
+    padding: 40px 12px 12px;
+}
+
+/* the toolbar icons are a little larger than the round buttons in the header */
+.toolbar .icon-btn { width: 42px; height: 42px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); }
+
+/* the search and mode icons sit straight on the picture, no round button behind them */
+#search-btn,
+#mode-btn {
+    background: none;
+    box-shadow: none;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+}
+#search-btn { left: 6px; font-size: 19px; }
+#mode-btn { left: 32px; width: 42px; height: 42px; margin-top: -6px; }
+#mode-btn img { border-radius: 0; object-fit: contain; }
+
+/* ==========================================================================
+   Welcome screen — the illustration is artwork only; typography and the Enter
+   control remain native HTML/CSS so they stay crisp and interactive.
+   ========================================================================== */
+.welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #160f13 url("./assets/icons/welcome.png") center center / cover no-repeat;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.welcome-screen[hidden] {
+    display: none;
+}
+
+.welcome-screen.is-leaving {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.welcome-content {
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    width: min(72%, 350px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    color: #f8e5bd;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+.welcome-eyebrow {
+    margin: 0 0 12px;
+    color: #e8c98d;
+    font-family: var(--serif);
+    font-size: clamp(9px, 2.4vw, 12px);
+    font-style: italic;
+    letter-spacing: 1.2px;
+}
+
+.welcome-content h1 {
+    margin: 0;
+    color: #f5d39a;
+    font-family: var(--serif);
+    font-size: clamp(27px, 7.4vw, 39px);
+    font-weight: 400;
+    line-height: 1.13;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 3px #10090b, 0 0 12px rgba(230, 168, 83, 0.2);
+}
+
+.welcome-subtitle {
+    margin: 17px 0 0;
+    color: #f3e3c7;
+    font-family: var(--serif);
+    font-size: clamp(10px, 2.9vw, 14px);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.enter-btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(64%, 184px);
+    aspect-ratio: 568 / 138;
+    margin-top: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #f6e7d0;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    transition: transform 160ms ease, filter 160ms ease;
+}
+
+.enter-shape {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.enter-shape .eb-glow { filter: drop-shadow(0 0 3px rgba(255, 170, 70, 0.9)); }
+
+.enter-label {
+    position: relative;
+    font-family: var(--serif);
+    font-size: clamp(14px, 4vw, 19px);
+    letter-spacing: 0.6px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.enter-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.15) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+}
+
+.enter-btn:active { transform: translateY(1px); }
+
+.enter-btn:focus-visible {
+    outline: 2px solid #fff0c8;
+    outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .enter-btn { transition: none; }
+}
+
+/* rating stars and the note on a finished book */
+.stars { display: flex; justify-content: center; gap: 2px; }
+.stars button {
+    padding: 0 2px;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--accent);
+    font-size: 28px;
+    line-height: 1;
+}
+.stars button:hover { transform: scale(1.15); }
+.review { display: flex; flex-direction: column; gap: 6px; }
+.review .muted { margin: 0; }
+.card textarea { resize: none; }
+
+/* backup card on the goal screen */
+.backup { padding: 10px 12px; text-align: center; }
+.backup p { margin: 0 0 8px; font-size: 11px; }

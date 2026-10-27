@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Book shelf</title>
+</head>
+<body>
+    <!-- Welcome screen -->
+    <section id="welcome-screen" class="welcome-screen" aria-labelledby="welcome-title">
+        <div class="welcome-content">
+            <p class="welcome-eyebrow">A little world between pages</p>
+            <h1 id="welcome-title">Welcome to<br>Your Library</h1>
+            <p class="welcome-subtitle">A quiet place for big dreams,<br>deep thoughts and new chapters.</p>
+            <button id="enter-btn" class="enter-btn" type="button">
+                <svg class="enter-shape" viewBox="0 0 568 138" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="eb-fill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#7a3a22"/>
+                            <stop offset="0.5" stop-color="#5a281a"/>
+                            <stop offset="1" stop-color="#3f1b12"/>
+                        </linearGradient>
+                        <linearGradient id="eb-line" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#ffc27a"/>
+                            <stop offset="0.5" stop-color="#e8873a"/>
+                            <stop offset="1" stop-color="#ffb36b"/>
+                        </linearGradient>
+                        <radialGradient id="eb-star" cx="0.5" cy="0.5" r="0.5">
+                            <stop offset="0" stop-color="#fff2c8"/>
+                            <stop offset="0.55" stop-color="#ffb04f"/>
+                            <stop offset="1" stop-color="#e2651f"/>
+                        </radialGradient>
+                        <path id="eb-outline" d="M6 69 C20 60 34 46 42 28 Q46 12 62 10 L506 10 Q522 12 526 28 C534 46 548 60 562 69 C548 78 534 92 526 110 Q522 126 506 128 L62 128 Q46 126 42 110 C34 92 20 78 6 69 Z"/>
+                        <path id="eb-sparkle" d="M0 -17 Q2 -3 17 0 Q2 3 0 17 Q-2 3 -17 0 Q-2 -3 0 -17 Z"/>
+                    </defs>
+                    <use href="#eb-outline" fill="url(#eb-fill)" stroke="url(#eb-line)" stroke-width="4"/>
+                    <use href="#eb-outline" fill="none" stroke="url(#eb-line)" stroke-width="1.6" opacity="0.9"
+                         transform="translate(284 69) scale(0.955 0.84) translate(-284 -69)"/>
+                    <g class="eb-glow">
+                        <use href="#eb-sparkle" fill="url(#eb-star)" transform="translate(88 69)"/>
+                        <use href="#eb-sparkle" fill="url(#eb-star)" transform="translate(480 69)"/>
+                        <use href="#eb-sparkle" fill="url(#eb-star)" transform="translate(56 66) scale(0.4)"/>
+                        <use href="#eb-sparkle" fill="url(#eb-star)" transform="translate(512 66) scale(0.4)"/>
+                    </g>
+                    <g fill="none" stroke="url(#eb-line)" stroke-width="2" stroke-linecap="round">
+                        <path d="M26 70 C30 58 44 58 48 66 M30 74 C36 80 46 78 48 72"/>
+                        <path d="M542 70 C538 58 524 58 520 66 M538 74 C532 80 522 78 520 72"/>
+                    </g>
+                </svg>
+                <span class="enter-label">Enter</span>
+            </button>
+        </div>
+    </section>
+
+    <div class="app">
+        <header class="header">
+            <span class="title" id="view-title">My Book Shelf</span>
+            <input id="search-input" class="search-input" type="search" placeholder="Search by name…" autocomplete="off" hidden>
+            <button id="search-btn" class="icon-btn" title="Search books">🔍</button>
+            <button id="mode-btn" class="icon-btn" title="Switch to night"><img src="./assets/icons/lunar.png" alt="🌙"></button>
+            <button id="close-btn" class="icon-btn" title="Close"><img src="./assets/icons/close.png" alt="✕"></button>
+        </header>
+
+        <main id="shelf" class="shelf"></main>
+        <main id="panel" class="panel" hidden></main>
+
+        <p id="toast" class="toast" hidden></p>
+
+        <!-- Icons come from assets/icons/<name>.png; the alt text is the fallback -->
+        <footer class="toolbar">
+            <button data-view="shelf" class="icon-btn" title="Shelf"><img src="./assets/icons/book_shelf.png" ></button>
+            <button data-view="reading" class="icon-btn" title="Currently reading"><img src="./assets/icons/currently_reading.png"></button>
+            <button id="shuffle-btn" class="icon-btn" title="Shuffle: pick a book to read"><img src="./assets/icons/shuffle.png"></button>
+            <button id="add-btn" class="icon-btn" title="Add book"><img src="./assets/icons/add.png"></button>
+            <button data-view="archive" class="icon-btn" title="Archive"><img src="./assets/icons/archive.png"></button>
+            <button data-view="stats" class="icon-btn" title="Reading goal"><img src="./assets/icons/progress.png"></button>
+        </footer>
+    </div>
+
+
+    <!-- Add book -->
+    <div id="add-modal" class="modal" hidden>
+        <form id="add-form" class="card">
+            <h2>Add book</h2>
+            <input name="title" placeholder="Name" required>
+            <input name="author" placeholder="Author">
+            <textarea name="description" placeholder="Description" rows="2"></textarea>
+            <input name="pages" type="number" min="1" placeholder="Nr. pages" required>
+            <div class="row">
+                <input name="series" placeholder="Series (optional)">
+                <input name="seriesIndex" type="number" min="1" placeholder="#">
+            </div>
+            <label class="color-row">Color for book <input name="color" type="color" value="#ff889c"></label>
+            <div class="row">
+                <button type="button" data-close>Cancel</button>
+                <button type="submit">Add</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Book info -->
+    <div id="info-modal" class="modal" hidden>
+        <div class="card" id="info-card"></div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
